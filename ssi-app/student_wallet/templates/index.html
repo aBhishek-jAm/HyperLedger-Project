@@ -1,0 +1,16 @@
+<h2>Student Wallet</h2>
+
+{% if credentials %}
+    {% for c in credentials %}
+        <div class="card">
+            <p><b>Name:</b> {{ c.attrs.name }}</p>
+            <p><b>USN:</b> {{ c.attrs.usn }}</p>
+            <p><b>Branch:</b> {{ c.attrs.branch }}</p>
+            <p><b>Year:</b> {{ c.attrs.year }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No credentials stored.</p>
+{% endif %}
+
+<a href="/">Refresh</a>

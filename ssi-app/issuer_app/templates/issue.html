@@ -1,0 +1,25 @@
+<h2>🪪 Issue Credential</h2>
+<form method="POST" class="mt-4">
+    <label>Connection</label>
+    <select name="connection_id" class="form-select">
+        {% for c in connections %}
+        <option value="{{c.connection_id}}">{{c.their_label}} ({{c.state}})</option>
+        {% endfor %}
+    </select>
+
+    <label class="mt-3">Name:</label>
+    <input class="form-control" name="name" required>
+
+    <label>USN:</label>
+    <input class="form-control" name="usn" required>
+
+    <label>Branch:</label>
+    <input class="form-control" name="branch" required>
+
+    <label>Year:</label>
+    <input class="form-control" name="year" required>
+
+    <input type="hidden" name="cred_def_id" value="PUT-YOUR-CRED-DEF-ID-HERE">
+
+    <button class="btn btn-success mt-4">Issue</button>
+</form>

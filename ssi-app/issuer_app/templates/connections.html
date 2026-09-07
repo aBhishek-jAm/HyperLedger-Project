@@ -1,0 +1,19 @@
+<h2>Active Connections</h2>
+
+<table border = "1">
+    <tr>
+        <th>Connection ID</th>
+        <th>State</th>
+        <th>Label</th>
+    </tr>
+
+    {% for c in connections %}
+    <tr>
+        <td>{{ c.connection_id }}</td>
+        <td>{{ c.state }}</td>
+        <td>{{ c.their_label }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/">Back</a>

@@ -1,302 +1,426 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+<p align="center">
+  <strong>🔐 TRUST</strong>NET — Blockchain-Based Student Identity Verification System
+</p>
 
-# VON Network
+<p align="center">
+  <img src="https://img.shields.io/badge/Hyperledger-Indy-blue?style=for-the-badge&logo=hyperledger" alt="Hyperledger Indy">
+  <img src="https://img.shields.io/badge/Aries-Cloud_Agent-purple?style=for-the-badge" alt="Aries Cloud Agent">
+  <img src="https://img.shields.io/badge/Flask-Web_UI-green?style=for-the-badge&logo=flask" alt="Flask">
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker" alt="Docker Compose">
+  <img src="https://img.shields.io/badge/License-Apache%202.0-orange?style=for-the-badge" alt="License">
+</p>
 
-A portable development level Indy Node network, including a Ledger Browser. The Ledger Browser (for example the BC Gov's [Ledger for the GreenLight Demo Application](http://greenlight.bcovrin.vonx.io/)) allows a user to see the status of the nodes of a network and browse/search/filter the Ledger Transactions.
+---
 
-`von-network` is being developed as part of the Verifiable Organizations Network (VON). For more information on VON see https://vonx.io.  Even, better - join in with what we are doing and contribute to VON, Aries and Indy communities.
+## 📖 Overview
 
-# VON Network is Not a Production Level Indy Node Network
+**TrustNet** is a production-grade **Self-Sovereign Identity (SSI)** system built on top of **Hyperledger Indy** and **Aries Cloud Agent Python (ACA-Py)**. It demonstrates a real-world use case where:
 
-VON Network is not a production level Indy Node network.  It was designed as a provisional network for development and testing purposes only.  It provides you with an exceptionally simple way to spin up an Indy Node network, but is lacking many of the features and safeguards needed for a production level network.
+- 🏛️ A **College** issues verifiable digital student ID cards  
+- 🎓 A **Student** stores credentials in a digital wallet  
+- 🏢 A **Company** verifies student identity during recruitment  
 
-VON Network is provided as is for development and testing.  Please do not use it for production environments.
+All identity interactions happen on a **decentralized blockchain ledger** — no central authority controls the data. The student owns their identity.
 
-## The VON-Network Ledger Browser and API
+> Built on top of the [bcgov/von-network](https://github.com/bcgov/von-network) — a portable Hyperledger Indy node network.
 
-With the Ledger Browser (for example: [http://greenlight.bcovrin.vonx.io/](http://greenlight.bcovrin.vonx.io/)), you can see:
+---
 
-- The status of the Ledger nodes
-- The detailed status of the Ledger Nodes in JSON format (click the "Detailed Status" link)
-- The three ledger's of an Indy Network - Domain, Pool and Config (click the respective links)
-- The Genesis Transactions for the Indy Network instance.
-  - In an Indy Agent, use the URL `<server>/genesis` to GET the genesis file to use in initializing the Agent.
+## 🖼️ Screenshots
 
-By using the "Authenticate a new DID" part of the UI or posting the appropriate JSON to the VON-Network API (see an example script [here](https://github.com/bcgov/von-agent-template/blob/d1abcbeaa299ce6149570349848bb51716752457/init.sh#L90)), a new DID can be added to the Ledger. A known and published *Trust Anchor* DID is used to write the new DID to the Ledger.  This operation would not be permitted in this way on the Sovrin Main Network. However, it is a useful mechanism on sandbox Indy Networks used for testing.
+### 1. Dashboard — Connection Accepted
+The main TrustNet dashboard showing three agent panels. The student has just accepted an invitation from the College.
 
-In the `Domain` Ledger screen ([example](http://greenlight.bcovrin.vonx.io/browse/domain)), you can browse through all of the transactions that have been created on this instance of the Ledger.  As well, you can use a drop down filter to see only specific Ledger transaction types (`nym` - aka DID, `schema`, `CredDef`, etc.), and search for strings in the content of the transactions.
+![Dashboard with connection accepted](screenshots/01_connection_accepted.png)
 
-## VON Network Quick Start Guide
+### 2. Invitation Created
+The College creates a DIDComm invitation JSON that the Student can accept to establish a peer-to-peer connection.
 
-New to VON Network?  We have a [tutorial about using VON Network](docs/UsingVONNetwork.md) to get you started.
+![Invitation created](screenshots/02_invitation_created.png)
 
-Note that in order to use Docker Desktop (> version 3.4.0), make sure you uncheck the "Use Docker Compose V2" in Docker Desktop > Preferences > General.  Refer to this issue for additional details; [#170](https://github.com/bcgov/von-network/issues/170#issuecomment-972898014)
+### 3. Credential Issued & Proof Requested
+The Student's wallet now contains a verifiable Student ID Card (with QR code). A proof request from the Company is pending.
 
+![Credential and proof request](screenshots/03_credential_and_proof.png)
 
+### 4. College Requesting Alumni Proof
+The College can also verify alumni status by requesting a proof from the Student's wallet.
 
-Want to see a full demo that includes applications and verifiable credentials being issued? The [VON Quick Start Guide](https://github.com/bcgov/greenlight/blob/master/docker/VONQuickStartGuide.md) provides the instructions for running a local instance of a full demo of the components, including an Indy Network, an instance of [TheOrgBook](https://github.com/bcgov/TheOrgBook) and [GreenLight](https://github.com/bcgov/greenlight). This is a great way to see the **VON Network** in action.
+![College proof request](screenshots/04_college_proof_request.png)
 
-## Indy-Cli Container Environment
+### 5. Credential Stored in Wallet
+The Student's credential is securely stored in their digital wallet, ready to be presented to any verifier.
 
-This repository includes a fully containerized Indy-Cli environment, allowing you to use the Indy-Cli without having to build or install the Indy-SDK or any of its dependencies on your machine.
+![Credential stored](screenshots/05_credential_stored.png)
 
-For more information refer to [Using the containerized `indy-cli`](./docs/Indy-CLI.md)
+---
 
-## Ledger Troubleshooting
+## 🏗️ Architecture
 
-Refer to the [Troubleshooting](./docs/Troubleshooting.md) document for some tips and tools you can use to troubleshoot issues with a ledger.
-
-## VON Quick Start Guide
-The environment provides a set of batch script templates and a simple variable substitution layer that allows the scripts to be reused for a number of purposes.
-
-For examples of how to use this capability, refer to [Writing Transactions to a Ledger for an Un-privileged Author](./docs/Writing%20Transactions%20to%20a%20Ledger%20for%20an%20Un-privileged%20Author.md)
-
-## Running the Network Locally
-
-The [tutorial about using VON Network](docs/UsingVONNetwork.md) has information on starting (and stopping) the network locally.
-
-## Running the web server in Docker against another ledger
-
-
-1. Run docker to start the ledger, and pass in GENESIS_URL and LEDGER_SEED parameters:
-
-For example to connect to the Sovrin Test Network:
-
-```bash
-./manage build
-GENESIS_URL=https://raw.githubusercontent.com/sovrin-foundation/sovrin/master/sovrin/pool_transactions_sandbox_genesis ./manage start-web
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        NGINX (HTTPS :443)                       │
+│                     Reverse Proxy + SSL/TLS                     │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Flask Web UI (:5000)                          │
+│              TrustNet Dashboard (app.py)                         │
+│         College Issuer │ Student Wallet │ Company Portal         │
+└────────┬───────────────┼───────────────┼────────────────────────┘
+         │               │               │
+         ▼               ▼               ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ College Agent│ │ Student Agent│ │ Company Agent│
+│  ACA-Py      │ │  ACA-Py      │ │  ACA-Py      │
+│  :8024/:8033 │ │  :8022/:8031 │ │  :8026/:8035 │
+└──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+       │                │                │
+       └────────────────┼────────────────┘
+                        ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Hyperledger Indy Ledger (4 Nodes)                  │
+│         Node1(:9701-02) Node2(:9703-04)                         │
+│         Node3(:9705-06) Node4(:9707-08)                         │
+│                                                                 │
+│              + Webserver (Ledger Browser :8000)                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-Note that it takes some time to get the transactions and status from the network. Once the UI appears, try getting the `Genesis Transaction` that the server started up properly.
+### Key Components
 
-## Running the web server on your local machine
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Ledger** | Hyperledger Indy (4 validator nodes) | Decentralized blockchain for DID/Schema/CredDef storage |
+| **Agents** | Aries Cloud Agent Python (ACA-Py) v0.12 | DIDComm messaging, credential issuance, proof verification |
+| **Web UI** | Flask + Bootstrap 5 | Unified dashboard for all three actors |
+| **Reverse Proxy** | Nginx with self-signed SSL | HTTPS termination, routing |
+| **Orchestration** | Docker Compose | Single-command deployment of all services |
 
-You can run the web server/ledger browser on its own, and point to another Indy/Sovrin network.
+---
 
-1. Install python and pip (recommend to use a virtual environment such as virtualenv)
+## 🚀 Prerequisites
 
-2. Download this repository:
+- **Docker** (v20.10+) and **Docker Compose** (v2+)
+- **Python 3.8+** (for running `setup_ledger.py` locally)
+- **Git**
+- At least **4 GB RAM** available for Docker
+
+---
+
+## ⚡ Quick Start
+
+### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/bcgov/von-network.git
+git clone https://github.com/<your-username>/von-network.git
 cd von-network
 ```
 
-3. If using virtualenv, setup a virtual environment and activate it:
+### Step 2: Build the Base VON Network Image
 
 ```bash
-virtualenv --python=python3.6 venv
-source venv/bin/activate
+./manage build
 ```
 
-4. Install requirements:
+> ⏳ This builds the Hyperledger Indy node base image. It takes a few minutes on the first run.
+
+### Step 3: Generate Self-Signed SSL Certificates
 
 ```bash
-pip install -r server/requirements.txt
+mkdir -p config/nginx/certs
+cd config/nginx/certs
+
+# Generate DH parameters
+openssl dhparam -out dhparam.pem 2048
+
+# Generate self-signed certificate
+openssl req -x509 -nodes -days 365 \
+  -newkey rsa:2048 \
+  -keyout nginx-selfsigned.key \
+  -out nginx-selfsigned.crt \
+  -subj "/CN=localhost"
+
+cd ../../..
 ```
 
-5. Run the server, you can specify a genesis file, or a url from which to download a genesis file - you can also specify a seed for the DID to use to connect to this ledger:
+### Step 4: Start the Full Stack
 
 ```bash
-GENESIS_FILE=/tmp/some-genesis.txt PORT=9000 python -m server.server
+docker compose -p von -f full-stack-compose.yml up -d
 ```
 
-Or:
+This starts **10 containers**:
+- 4 Indy validator nodes
+- 1 Indy client
+- 1 Ledger webserver
+- 3 ACA-Py agents (Student, College, Company)
+- 1 Web UI (Flask)
+- 1 Nginx reverse proxy
+
+### Step 5: Wait for Services to Initialize
 
 ```bash
-GENESIS_URL=https://some.domain.com/some-genesis.txt LEDGER_SEED=000000000000000000000000SomeSeed PORT=9000 python -m server.server
+# Wait ~40 seconds for all nodes to sync and agents to provision wallets
+sleep 40
 ```
 
-For example to connect to the STN:
+### Step 6: Register DIDs on the Ledger
 
 ```bash
-GENESIS_URL=https://raw.githubusercontent.com/sovrin-foundation/sovrin/master/sovrin/pool_transactions_sandbox_genesis LEDGER_SEED=000000000000000000000IanCostanzo PORT=9000 python -m server.server
+# Register the three agent DIDs as Trust Anchors
+docker exec von-webserver-1 curl -s -X POST http://localhost:8000/register \
+  -d '{"seed":"Student0000000000000000000000001","role":"TRUST_ANCHOR","alias":"Student"}' \
+  -H "Content-Type: application/json"
+
+docker exec von-webserver-1 curl -s -X POST http://localhost:8000/register \
+  -d '{"seed":"College0000000000000000000000001","role":"TRUST_ANCHOR","alias":"College"}' \
+  -H "Content-Type: application/json"
+
+docker exec von-webserver-1 curl -s -X POST http://localhost:8000/register \
+  -d '{"seed":"Company0000000000000000000000001","role":"TRUST_ANCHOR","alias":"Company"}' \
+  -H "Content-Type: application/json"
 ```
 
-## Running the Network on a VPS
-
-### Requirements
-
-- ubuntu 16.04
-- at least 1GB RAM
-- accepting incoming TCP connections on ports 9701-9708
-- root access
-
-1. Install unzip utility:
-
-    ```bash
-    # Requires root privileges
-    apt install unzip
-    ```
-
-2. Install Docker and Docker Compose:
-
-    ```bash
-    curl -fsSL get.docker.com -o get-docker.sh
-    ```
-
-    ```bash
-    # Requires root privileges
-    sh get-docker.sh
-    ```
-
-    ```bash
-    curl -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-    ```
-
-    ```bash
-    chmod +x /usr/local/bin/docker-compose
-    ```
-
-3. Download this repository:
-
-    ```bash
-    curl -L https://github.com/bcgov/von-network/archive/main.zip > bcovrin.zip && \
-        unzip bcovrin.zip && \
-        cd von-network-main && \
-        chmod a+w ./server/
-    ```
-
-4. Build the Docker container:
-
-    ```bash
-    ./manage build
-    ```
-
-5. Run the network of nodes:
-
-    ```bash
-    # This command requires the publicly accessible ip address of the machine `public_ip_address`
-    # WEB_SERVER_HOST_PORT maps the docker service port to a public port on the machine
-    # LEDGER_INSTANCE_NAME sets the display name of the ledger on the page headers.
-    ./manage start public_ip_address WEB_SERVER_HOST_PORT=80 "LEDGER_INSTANCE_NAME=My Ledger" &
-    ```
-
-### AWS EC2 Security considerations
-
-If you are installing on an Amazon EC2 node you may find the Indy nodes are failing to connect to each other. The signature for this will be a repeating message every 60 seconds when you view the logs via "./manage log"
+### Step 7: Create Schema & Credential Definition
 
 ```bash
-node2_1 | 2020-05-07 23:56:30,728|NOTIFICATION|primary_connection_monitor_service.py|Node2:0 primary has been disconnected for too long
-node2_1 | 2020-05-07 23:56:30,729|INFO|primary_connection_monitor_service.py|Node2:0 The node is not ready yet so view change will not be proposed now, but re-scheduled.
-node2_1 | 2020-05-07 23:56:30,730|INFO|primary_connection_monitor_service.py|Node2:0 scheduling primary connection check in 60 sec
-node2_1 | 2020-05-07 23:56:30,730|NOTIFICATION|primary_connection_monitor_service.py|Node2:0 primary has been disconnected for too long
-node2_1 | 2020-05-07 23:56:30,730|INFO|primary_connection_monitor_service.py|Node2:0 The node is not ready yet so view change will not be proposed now, but re-scheduled.
+# Wait for agents to pick up their DIDs
+sleep 10
+
+# Run the setup script
+pip install requests  # if not already installed
+python3 aries_ui/setup_ledger.py
 ```
 
-The Indy nodes are configured to talk to each other via their "public" address not the Virtual Private Cloud address of the EC2 node. It is common practice to tightly restrict traffic inbound to public IPs when first setting up a deployment in AWS.  You will need to adjust the Inbound and Outbound traffic rules on your Security Groups to allow traffic specifically from the public EC2 address.
+You'll see output like:
+```
+🚀 Registering Schema and Cred Def on Ledger...
+🔹 Creating Schema: skit_student_id_XXXX...
+✅ Schema ID: GHiehWQfcT89c7di62WriQ:2:skit_student_id_XXXX:1.0
+🔹 Creating Credential Definition...
+✅ Cred Def ID: GHiehWQfcT89c7di62WriQ:3:CL:XX:default
 
+--- ⚠️ COPY THESE NEW IDs INTO app.py ⚠️ ---
+```
 
-## Connecting to the Network
+### Step 8: Update IDs in `app.py`
 
-### With the CLI
-Once the nodes are all running and have connected to each other, you can run the Indy client to test the connection in a separate terminal window:
+Open `aries_ui/app.py` and update the `SCHEMA_ID` and `CRED_DEF_ID` values with the output from the previous step:
+
+```python
+SCHEMA_ID = "GHiehWQfcT89c7di62WriQ:2:skit_student_id_XXXX:1.0"  # Your schema ID
+CRED_DEF_ID = "GHiehWQfcT89c7di62WriQ:3:CL:XX:default"           # Your cred def ID
+```
+
+### Step 9: Rebuild the Web UI Container
 
 ```bash
-./manage cli
+docker compose -p von -f full-stack-compose.yml up -d --build --force-recreate web-ui
 ```
 
-If you want to connect to a remote indy-node pool, you can optionally supply an ip address. (Currently only supports a test network running on a single machine with a single ip address.)
+### Step 10: Open the Dashboard
 
+Navigate to **https://localhost** in your browser.
+
+> ⚠️ You'll see a browser warning about the self-signed certificate. Click **"Advanced"** → **"Proceed to localhost"** to continue.
+
+---
+
+## 🎯 Demo Flow
+
+### 1️⃣ Establish Connection (College ↔ Student)
+
+1. On the **College Issuer** panel, click **"Create Student Invitation"**
+2. The invitation JSON will appear in the **Student Wallet** panel
+3. The system auto-accepts the invitation
+4. Refresh the page — you'll see **"Invitation Accepted from College!"**
+
+### 2️⃣ Issue Digital Student ID
+
+1. On the **College Issuer** panel, select the active student connection
+2. Fill in the student details:
+   - **Name**: e.g., "Akash SG"
+   - **USN**: e.g., "1AK018"
+   - **Branch**: e.g., "CSE"
+   - **Year**: e.g., "2026"
+3. Click **"Issue Digital ID"**
+4. Refresh the page — the student should see the credential offer
+5. Click **"Accept"** → then **"Store"** on the Student panel
+6. The **Student ID Card** with a QR code will appear in the wallet!
+
+### 3️⃣ Connect with Company
+
+1. On the **Company Portal**, click **"Invite Candidate"**
+2. The invitation auto-connects with the student
+3. Refresh to confirm active connection
+
+### 4️⃣ Verify Student Identity
+
+1. On the **Company Portal**, select the student and click **"Verify Identity"**
+2. On the **Student Wallet**, you'll see a **"Proof Requested"** notification
+3. Click **"Share ID Data"** to present the verifiable proof
+4. Back on the Company panel, click **"Verify"** to cryptographically validate
+
+✅ The result will show **"Verified: True ✅"** — the student's identity is confirmed without any central database!
+
+---
+
+## 📁 Project Structure
+
+```
+von-network/
+├── aries_ui/                          # 🎨 TrustNet Web Application
+│   ├── app.py                         # Flask backend (routes, agent communication)
+│   ├── Dockerfile                     # Docker image for the web UI
+│   ├── setup_ledger.py                # Schema & credential definition registration
+│   ├── clear_wallet.py                # Utility to reset agent wallets
+│   ├── docker-compose.yml             # Standalone compose (for development)
+│   └── templates/
+│       └── dashboard.html             # Main UI template (Bootstrap 5)
+│
+├── config/
+│   └── nginx/
+│       ├── nginx.conf                 # Nginx reverse proxy configuration
+│       └── certs/                     # Self-signed SSL certificates
+│
+├── full-stack-compose.yml             # 🐳 Production Docker Compose (all services)
+├── screenshots/                       # 📸 Project screenshots
+│
+├── ssi-app/                           # Legacy SSI app (separate Flask apps)
+│   ├── issuer_app/                    # College issuer (standalone version)
+│   ├── student_wallet/                # Student wallet (standalone version)
+│   └── verifier_app/                  # Company verifier (standalone version)
+│
+├── server/                            # VON Network ledger browser server
+├── scripts/                           # Node startup scripts
+├── config/                            # Ledger configuration
+├── docs/                              # VON Network documentation
+├── manage                             # VON Network management script
+├── docker-compose.yml                 # Original VON Network compose
+├── Dockerfile                         # VON Network base image
+└── README.md                          # This file
+```
+
+---
+
+## 🛑 Stopping and Restarting
+
+### Stop everything:
 ```bash
-./manage cli <ip address>
+docker compose -p von -f full-stack-compose.yml down
 ```
 
-The Indy CLI should boot up and you should see the following:
+### Restart (fresh):
+```bash
+# Remove old volumes to start clean
+docker compose -p von -f full-stack-compose.yml down -v
 
-```
-Indy-CLI (c) 2017 Evernym, Inc.
-Type 'help' for more information.
-Running Indy 1.1.159
+# Start again
+docker compose -p von -f full-stack-compose.yml up -d
 
-indy>
-```
-
-Now connect to our new Indy network to make sure network is running correctly:
-
-```
-pool connect sandbox
+# Wait, register DIDs, run setup_ledger.py again (Steps 5-9)
 ```
 
-What you should see is:
+### View logs:
+```bash
+# All services
+docker compose -p von -f full-stack-compose.yml logs -f
+
+# Specific service
+docker logs von-web-ui-1 -f
+docker logs von-college-agent-1 -f
+```
+
+---
+
+## 🔧 Configuration
+
+### Agent URLs (in `aries_ui/app.py`)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `STUDENT_AGENT` | `http://localhost:8022` | Student ACA-Py admin API |
+| `COLLEGE_AGENT` | `http://localhost:8024` | College ACA-Py admin API |
+| `COMPANY_AGENT` | `http://localhost:8026` | Company ACA-Py admin API |
+
+> When running inside Docker, these are overridden via environment variables in `full-stack-compose.yml` to use Docker service names (e.g., `http://student-agent:8022`).
+
+### Ports
+
+| Port | Service |
+|------|---------|
+| 80 | HTTP → HTTPS redirect |
+| 443 | **TrustNet Dashboard (HTTPS)** |
+| 8022 | Student Agent Admin API |
+| 8024 | College Agent Admin API |
+| 8026 | Company Agent Admin API |
+| 8031 | Student Agent Inbound |
+| 8033 | College Agent Inbound |
+| 8035 | Company Agent Inbound |
+| 9701-9708 | Indy Validator Nodes |
+
+---
+
+## 🧠 How It Works (SSI Concepts)
+
+### Decentralized Identifiers (DIDs)
+Each agent (Student, College, Company) has a unique DID registered on the Indy ledger. DIDs are like blockchain addresses for identity.
+
+### Verifiable Credentials
+The College writes a **Schema** (defining fields: name, USN, branch, year) and a **Credential Definition** to the ledger. Using these, it can issue tamper-proof digital credentials to students.
+
+### Zero-Knowledge Proofs
+When a Company asks to verify a student's identity, the student can share a **cryptographic proof** without revealing unnecessary information. The proof is verified against the ledger — no need to call the College!
+
+### Trust Triangle
 
 ```
-indy> pool connect sandbox
-Pool "sandbox" has been connected
+         College (Issuer)
+        /                \
+       / Issues            \ Schema & CredDef
+      /   Credential        \ on Ledger
+     ▼                       ▼
+  Student ──────────────► Company
+  (Holder)   Presents     (Verifier)
+             Proof
 ```
 
-If you see this, congratulations! Your nodes are running correctly and you have a connection to the network.
+---
 
-<!-- ### With the Indy SDK
+## 🛠️ Tech Stack
 
-The Docker container that is built by this environment provides a `von_generate_transactions` command that to automatically discover node ip addresses and generate an accurate genesis transaction file.
+| Technology | Version | Role |
+|-----------|---------|------|
+| [Hyperledger Indy](https://www.hyperledger.org/projects/hyperledger-indy) | - | Distributed ledger for decentralized identity |
+| [Aries Cloud Agent Python](https://github.com/hyperledger/aries-cloudagent-python) | 0.12 LTS | DIDComm agent framework |
+| [VON Network](https://github.com/bcgov/von-network) | Latest | Portable Indy node network |
+| [Flask](https://flask.palletsprojects.com/) | 3.x | Web application framework |
+| [Bootstrap](https://getbootstrap.com/) | 5.3 | Frontend CSS framework |
+| [Nginx](https://nginx.org/) | Alpine | Reverse proxy with SSL |
+| [Docker](https://www.docker.com/) | 20.10+ | Containerization |
 
-To use this tool, you must ensure that you a running a Docker container that inherits from `von-base` and that your docker environment is running a docker network called `von`.
+---
 
-Once you have done this, your environment should be able to automatically connect to the node pool by running `von_generate_transactions` before running any software that uses the Indy SDK.
+## 📝 Notes
 
-See [von-connector](https://github.com/nrempel/von-connector) for an example.
- -->
+- This project is for **educational and demonstration purposes only** — not for production use
+- The Indy ledger nodes run locally; this is **not** connected to any public blockchain network
+- SSL certificates are self-signed; browsers will show a security warning
+- Agent wallets are stored in Docker volumes; use `docker compose down -v` to reset everything
+- The `ssi-app/` directory contains an earlier version of the project with separate Flask apps for each actor
 
-## Extra Features for Development
+---
 
-Running BCovrin also runs a thin webserver (at [http://localhost:9000](http://localhost:9000) when using docker) to expose some convenience functions:
+## 🙏 Credits
 
-#### Genesis Transaction Exposed
+- **VON Network** by [BC Gov](https://github.com/bcgov/von-network) — The foundation for the Indy ledger
+- **Aries Cloud Agent Python** by [Hyperledger](https://github.com/hyperledger/aries-cloudagent-python) — The agent framework
+- Built as a demonstration project for **Self-Sovereign Identity** concepts
 
-The genesis transaction record required to connect to the node pool is made available at:
+---
 
-`<ip_address>/genesis`
+## 📄 License
 
-#### Write new did for seed
-
-The node pool can have a trust anchor write a did for you. That feature is available in the UI.
-
-## Customize your Ledger Browser Deployment
-
-It is possible to customize some of the aspects of the Ledger Browser at run-time, by using the following environment variables.  Defaults are listed in the [`<default-state>`] brackets beside each variable:
-
-- `REGISTER_NEW_DIDS` [`False`]: When set to `True` the "Authenticate a New DID" interface will be enabled, allowing new identity owners to write a DID to the ledger.  When set to `False` the interface and associated API will be disabled.
-
-- `ENABLE_LEDGER_CACHE` [`True`]: Enables the ledger cache used for the built in ledger browsing features. Setting to `False` disables the cache, which is useful when you only want to use the browser for monitoring the nodes.
-
-- `ENABLE_BROWSER_ROUTES` [`True`]: Enables the ledger browser API used by the  built in ledger browsing features. Setting to `False` disables the ledger browser API, which is useful when you only want to use the browser for monitoring the nodes.
-
-- `DISPLAY_LEDGER_STATE` [`True`]: Enables the ledger state interface which contains the links to browse the state of the ledgers. Setting to `False` disables the interface.
-
-- `LEDGER_INSTANCE_NAME` [`Ledger Browser`]: The name of the ledger instance the browser is connected to.
-
-- `LEDGER_DESCRIPTION` [`Contributed by the Province of British Columbia`]: A description of the ledger instance.
-
-- `INFO_SITE_TEXT` [value of `INFO_SITE_URL`]: The display text used for the `INFO_SITE_URL`.
-
-- `INFO_SITE_URL`: A URL that will be displayed in the header, and can be used to reference another external website containing details/resources on the current ledger instance.
-
-- `WEB_ANALYTICS_SCRIPT` [`<empty>`]: the JavaScript code used by web analytics servers. Populate this environment variable if you want to track the usage of your site with Matomo, Google Analytics or any other JavaScript based trackers. Include the whole ```<script type="text/javascript">...</script>``` tag, ensuring quotes are escaped properly for your command-line interpreter (e.g.: bash, git bash, etc.).
-
-- `LEDGER_CACHE_PATH` [`<empty>`]: If set, it will instruct the ledger browser to create an on-disk cache, rather than in-memory cache.  The image supplies a folder for this purpose; `$HOME/.indy_client/ledger-cache`.  The file should be placed into this directory (e.g.: `/home/indy/.indy-client/ledger-cache/ledger_cache_file` or `$HOME/.indy_client/ledger-cache/ledger_cache_file`).
-
-- `INDY_SCAN_TEXT` [value of `INDY_SCAN_URL`]: The display text used for the `INDY_SCAN_URL`.
-
-- `INDY_SCAN_URL` [`<empty>`]: The URL to the external IndyScan ledger browser instance for the network.  This will replace the links to the builtin ledger browser tools.
-
-## Using IndyScan with VON Network
-
-[IndyScan](https://github.com/Patrik-Stas/indyscan) is production level transaction explorer for Hyperledger Indy networks.  It's a great tool for exploring and searching through the transactions on the various ledgers.
-
-You might be asking...  Why would I want to use IndyScan with `von-network`, when `von-network` has a built-in ledger browser?
-
-The short answer is performance at scale.  The built-in ledger browser works great for most local development purposes.  However, it starts running into performance issues when your instance contains over 100,000 transactions.  IndyScan on the other hand is backed by Elasticsearch and can easily scale well beyond that limitation.  So if you're hosting an instance of `von-network` for your organization to use for testing, like BC Gov does with [BCovrin Test](http://test.bcovrin.vonx.io/), you'll want to look into switching over to IndyScan as your ledger browser.
-
-To use IndyScan as your ledger browser for `von-network`, you're responsible for setting up and hosting your own instance of IndyScan.  Please refer to the [IndyScan](https://github.com/Patrik-Stas/indyscan) repository for information on how to accomplish this.  Once your IndyScan instance is up and running you can configure your `von-network` instance to provide a link to it on the main page by using the `INDY_SCAN_URL` and `INDY_SCAN_TEXT` variables described in the previous section.  The link to your IndyScan instance will replace the links to `von-network`'s built in ledger browser tools.
-
-## Contributing
-
-**Pull requests are always welcome!**
-
-Please see the [Contributions Guide](./CONTRIBUTING.md) for the repo.
-
-You may also create an issue if you would like to suggest additional resources to include in this repository.
-
-All contrbutions to this repository should adhere to our [Code of Conduct](./CODE_OF_CONDUCT.md).
+This project is licensed under the [Apache License 2.0](LICENSE).

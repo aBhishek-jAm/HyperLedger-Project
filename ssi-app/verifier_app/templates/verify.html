@@ -1,0 +1,16 @@
+<h2>Verify Credential</h2>
+
+<form method="POST">
+    <label>Connection:</label>
+    <select name="connection_id">
+        {% for c in connections %}
+        {% if c.state == "active" %}
+        <option value="{{ c.connection_id }}">{{ c.connection_id }}</option>
+        {% endif %}
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Send Verification Request</button>
+</form>
+
+<a href="/">Back</a>

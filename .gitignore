@@ -1,7 +1,15 @@
-# Certs and keys
+# Certs and keys (blanket rule)
 *.crt
 *.key
 *.pem
+
+# BUT allow the nginx self-signed certs needed for the project
+!config/nginx/certs/*.crt
+!config/nginx/certs/*.key
+!config/nginx/certs/*.pem
+
+# Large binary files (not suitable for GitHub)
+aries_ui/project_images.tar
 
 # Backup files
 backup/

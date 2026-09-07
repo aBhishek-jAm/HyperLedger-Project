@@ -1,0 +1,236 @@
+version: '3'
+services:
+  #
+  # --- PRODUCTION INFRASTRUCTURE ---
+  #
+  client:
+    image: von-network-base
+    command: ./scripts/start_client.sh
+    environment:
+      - IP=${IP}
+      - IPS=${IPS}
+      - DOCKERHOST=${DOCKERHOST}
+      - RUST_LOG=${RUST_LOG}
+    networks:
+      - von
+    volumes:
+      - client-data:/home/indy/.indy_client
+      - ./tmp:/tmp
+    restart: unless-stopped
+
+  webserver:
+    image: von-network-base
+    command: bash -c 'sleep 10 && ./scripts/start_webserver.sh'
+    environment:
+      - IP=${IP}
+      - IPS=${IPS}
+      - DOCKERHOST=${DOCKERHOST}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - RUST_LOG=${RUST_LOG}
+      - GENESIS_URL=${GENESIS_URL}
+      - LEDGER_SEED=000000000000000000000000Steward1
+      - REGISTER_NEW_DIDS=True  # Enabled internally so agents can register
+      - ENABLE_LEDGER_CACHE=True
+      - ENABLE_BROWSER_ROUTES=True
+      - LEDGER_INSTANCE_NAME=Production Ledger
+    networks:
+      - von
+    expose: 
+      - "8000"
+    volumes:
+      - ./config:/home/indy/config
+      - ./server:/home/indy/server
+      - webserver-cli:/home/indy/.indy-cli
+      - webserver-ledger:/home/indy/ledger
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - webserver
+      - web-ui
+    networks:
+      - von
+    restart: unless-stopped
+
+  # Nodes (Using individual services for best simulation)
+  node1:
+    image: von-network-base
+    command: ./scripts/start_node.sh 1
+    networks:
+      - von
+    ports:
+      - 9701:9701
+      - 9702:9702
+    environment:
+      - IP=${IP}
+      - IPS=${IPS}
+      - DOCKERHOST=${DOCKERHOST}
+    volumes:
+      - node1-data:/home/indy/ledger
+    restart: unless-stopped
+
+  node2:
+    image: von-network-base
+    command: ./scripts/start_node.sh 2
+    networks:
+      - von
+    ports:
+      - 9703:9703
+      - 9704:9704
+    environment:
+      - IP=${IP}
+      - IPS=${IPS}
+      - DOCKERHOST=${DOCKERHOST}
+    volumes:
+      - node2-data:/home/indy/ledger
+    restart: unless-stopped
+
+  node3:
+    image: von-network-base
+    command: ./scripts/start_node.sh 3
+    networks:
+      - von
+    ports:
+      - 9705:9705
+      - 9706:9706
+    environment:
+      - IP=${IP}
+      - IPS=${IPS}
+      - DOCKERHOST=${DOCKERHOST}
+    volumes:
+      - node3-data:/home/indy/ledger
+    restart: unless-stopped
+
+  node4:
+    image: von-network-base
+    command: ./scripts/start_node.sh 4
+    networks:
+      - von
+    ports:
+      - 9707:9707
+      - 9708:9708
+    environment:
+      - IP=${IP}
+      - IPS=${IPS}
+      - DOCKERHOST=${DOCKERHOST}
+    volumes:
+      - node4-data:/home/indy/ledger
+    restart: unless-stopped
+
+  #
+  # --- UI & ARIES AGENTS ---
+  #
+  web-ui:
+    build: 
+      context: ./aries_ui
+    networks:
+      - von
+    expose:
+      - "5000"
+    environment:
+      - FLASK_ENV=production
+      - STUDENT_AGENT=http://student-agent:8022
+      - COLLEGE_AGENT=http://college-agent:8024
+      - COMPANY_AGENT=http://company-agent:8026
+    depends_on:
+      - student-agent
+      - college-agent
+      - company-agent
+    restart: unless-stopped
+
+  student-agent:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12-lts
+    networks:
+      - von
+    ports:
+      - "8031:8031"
+      - "8022:8022"
+    command: >
+      start --label Student 
+      --inbound-transport http 0.0.0.0 8031 
+      --outbound-transport http 
+      --endpoint http://student-agent:8031 
+      --admin 0.0.0.0 8022 
+      --admin-insecure-mode 
+      --wallet-type askar 
+      --wallet-name student_wallet 
+      --wallet-key student_key 
+      --auto-provision 
+      --seed Student0000000000000000000000001 
+      --genesis-url http://webserver:8000/genesis
+    depends_on:
+      - webserver
+    restart: unless-stopped
+
+  college-agent:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12-lts
+    networks:
+      - von
+    ports:
+      - "8033:8033"
+      - "8024:8024"
+    command: >
+      start --label College 
+      --inbound-transport http 0.0.0.0 8033 
+      --outbound-transport http 
+      --endpoint http://college-agent:8033 
+      --admin 0.0.0.0 8024 
+      --admin-insecure-mode 
+      --wallet-type askar 
+      --wallet-name college_wallet 
+      --wallet-key college_key 
+      --auto-provision 
+      --seed College0000000000000000000000001 
+      --genesis-url http://webserver:8000/genesis
+    depends_on:
+      - webserver
+    restart: unless-stopped
+
+  company-agent:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12-lts
+    networks:
+      - von
+    ports:
+      - "8035:8035"
+      - "8026:8026"
+    command: >
+      start --label Company 
+      --inbound-transport http 0.0.0.0 8035 
+      --outbound-transport http 
+      --endpoint http://company-agent:8035 
+      --admin 0.0.0.0 8026 
+      --admin-insecure-mode 
+      --wallet-type askar 
+      --wallet-name company_wallet 
+      --wallet-key company_key 
+      --auto-provision 
+      --seed Company0000000000000000000000001 
+      --genesis-url http://webserver:8000/genesis
+    depends_on:
+      - webserver
+    restart: unless-stopped
+
+networks:
+  von:
+
+volumes:
+  client-data:
+  webserver-cli:
+  webserver-ledger:
+  node1-data:
+  node2-data:
+  node3-data:
+  node4-data:
+  nodes-data:

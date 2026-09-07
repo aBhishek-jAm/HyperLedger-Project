@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  # 1. Your Website
+  web-ui:
+    build: .
+    network_mode: "host"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+
+  # 2. Student Agent
+  student-agent:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12-lts
+    network_mode: "host"
+    command: >
+      start --label Student --inbound-transport http 0.0.0.0 8031 --outbound-transport http --endpoint http://localhost:8031 --admin 0.0.0.0 8022 --admin-insecure-mode --wallet-type askar --wallet-name student_wallet --wallet-key student_key --auto-provision --seed Student0000000000000000000000001 --genesis-url http://localhost:9000/genesis
+
+  # 3. College Agent
+  college-agent:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12-lts
+    network_mode: "host"
+    command: >
+      start --label College --inbound-transport http 0.0.0.0 8033 --outbound-transport http --endpoint http://localhost:8033 --admin 0.0.0.0 8024 --admin-insecure-mode --wallet-type askar --wallet-name college_wallet --wallet-key college_key --auto-provision --seed College0000000000000000000000001 --genesis-url http://localhost:9000/genesis
+
+  # 4. Company Agent
+  company-agent:
+    image: ghcr.io/hyperledger/aries-cloudagent-python:py3.9-0.12-lts
+    network_mode: "host"
+    command: >
+      start --label Company --inbound-transport http 0.0.0.0 8035 --outbound-transport http --endpoint http://localhost:8035 --admin 0.0.0.0 8026 --admin-insecure-mode --wallet-type askar --wallet-name company_wallet --wallet-key company_key --auto-provision --seed Company0000000000000000000000001 --genesis-url http://localhost:9000/genesis
